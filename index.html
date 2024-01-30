@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hava Durumu Uygulaması</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css">
+		body {
+			font-family: sans-serif;
+			background-color: #f7f7f7;
+			text-align: center;
+			padding-top: 50px;
+		}
+		h1 {
+			font-size: 2em;
+			margin-bottom: 30px;
+		}
+		input[type="text"] {
+			padding: 10px;
+			border: none;
+			background-color: #fff;
+			border-radius: 5px;
+			margin-right: 10px;
+			font-size: 1em;
+			width: 60%;
+			max-width: 500px;
+		}
+		button {
+			padding: 10px 20px;
+			border: none;
+			background-color: #4CAF50;
+			color: #fff;
+			border-radius: 5px;
+			font-size: 1em;
+			cursor: pointer;
+		}
+		.weather-card {
+			display: inline-block;
+			background-color: #fff;
+			padding: 20px;
+			margin: 20px;
+			border-radius: 5px;
+			box-shadow: 0px 5px 10px rgba(0,0,0,0.1);
+			text-align: center;
+			max-width: 300px;
+			min-width: 200px;
+			vertical-align: top;
+		}
+		.weather-card h2 {
+			font-size: 1.2em;
+			margin-bottom: 10px;
+		}
+		.weather-card img {
+			width: 80px;
+			height: auto;
+			margin-bottom: 10px;
+		}
+		.weather-card p {
+			font-size: 1.2em;
+			margin: 5px;
+		}
+		.weather-card .temp {
+			font-size: 2em;
+			font-weight: bold;
+			margin: 5px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Hava Durumu Uygulaması</h1>
+<input type="text" id="city" placeholder="Şehir adı girin...">
+<button onclick="getWeather()">Hava Durumunu Getir</button>
+<div id="weather-cards">
+</div>
+
+
+
+<script>
+	function getWeather() {
+		// şehir adını alın ve küçük harflere dönüştürün
+		var city = document.getElementById("city").value.toLowerCase();
+
+		// hava durumu API'sine GET isteği gönderin
+		var xhr = new XMLHttpRequest();		
+		var url = "https://api.openweathermap.org/data/2.5/weather?q="+ city + "&appid=6b719d0cbd224a423049ac17807f36a4";
+		xhr.open("GET", url);
+		xhr.send();
+
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				// istek başarılı oldu, JSON cevabını alın
+				var response = JSON.parse(xhr.responseText);
+
+				// hava durumu bilgilerini alın
+				var weather = response.weather[0].description;
+				var icon = "https://openweathermap.org/img/w/" + response.weather[0].icon + ".png";
+				var temp = response.main.temp;
+				var feelsLike = response.main.feels_like;
+
+				// hava durumunu gösteren kartı oluşturun
+				var weatherCard = document.createElement("div");
+				weatherCard.classList.add("weather-card");
+
+				var cityHeading = document.createElement("h2");
+				cityHeading.textContent = city;
+
+				var iconImg = document.createElement("img");
+				iconImg.setAttribute("src", icon);
+				iconImg.setAttribute("alt", weather);
+
+				var tempPara = document.createElement("p");
+				tempPara.classList.add("temp");
+				tempPara.textContent = Math.round(temp) + "°C";
+
+				var feelsLikePara = document.createElement("p");
+				feelsLikePara.textContent = "Hissedilen Sıcaklık: " + Math.round(feelsLike) + "°C";
+
+				var weatherPara = document.createElement("p");
+				weatherPara.textContent = weather;
+
+				weatherCard.appendChild(cityHeading);
+				weatherCard.appendChild(iconImg);
+				weatherCard.appendChild(tempPara);
+				weatherCard.appendChild(feelsLikePara);
+				weatherCard.appendChild(weatherPara);
+
+				// hava durumu kartını sayfaya ekleyin
+				var weatherCards = document.getElementById("weather-cards");
+				weatherCards.appendChild(weatherCard);
+			} else if (xhr.readyState === 4) {
+				// hata durumunu işle
+				alert("Hava durumu bilgisi alınamadı. Şehir adını doğru yazdığınızdan emin olun ve internet bağlantınızı kontrol edin.");
+			}
+		}
+	}
+</script>
+</body>
+</html>
